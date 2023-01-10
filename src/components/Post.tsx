@@ -4,10 +4,27 @@ import { Avatar } from './Avatar'
 import { Comment } from './Comment'
 
 import styles from './Post.module.css'
-import { useState } from 'react';
+import { FormEvent, useState, ChangeEvent, InvalidEvent } from 'react';
 
-export function Post({ author, publishedAt, content }) {
-  const [comments, setComments] = useState([])
+interface Author {
+  name: string;
+  role: string;
+  avatarUrl: string;
+}
+
+interface Content {
+  type: 'paragraph' | 'link';
+  content: string;
+}
+
+export interface PostProps {
+  author: Author;
+  publishedAt: Date;
+  content: Content[];
+}
+
+export function Post({ author, publishedAt, content }: PostProps) {
+  const [comments, setComments] = useState<string[]>([])
 
   const [newCommentText, setNewCommentText] = useState('')
 
@@ -17,7 +34,7 @@ export function Post({ author, publishedAt, content }) {
     addSuffix: true,
   });
 
-  function handleCreateNewComment() {
+  function handleCreateNewComment(event: FormEvent) {
     event.preventDefault()
 
     setComments([...comments, newCommentText]);
@@ -25,16 +42,16 @@ export function Post({ author, publishedAt, content }) {
     setNewCommentText('');
   }
 
-  function handleNewCommentChange() {
+  function handleNewCommentChange(event: ChangeEvent<HTMLTextAreaElement>) {
     event.target.setCustomValidity('');
     setNewCommentText(event.target.value);
   }
 
-  function handleNewCommentInvalid() {
+  function handleNewCommentInvalid(event: InvalidEvent<HTMLTextAreaElement>) {
     event.target.setCustomValidity('You must write something to post');
   }
 
-  function deleteComment(commentToDelete) {
+  function deleteComment(commentToDelete: string) {
     const commentsWithoutDeletedOne = comments.filter(comment => {
       return comment !== commentToDelete;
     })
